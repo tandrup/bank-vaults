@@ -96,6 +96,7 @@ func (s3 *s3Storage) Get(key string) ([]byte, error) {
 		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == awss3.ErrCodeNoSuchKey {
 			return nil, kv.NewNotFoundError("error getting object for key '%s': %s", n, aerr.Error())
 		}
+
 		return nil, errors.Wrapf(err, "error getting object for key '%s'", n)
 	}
 

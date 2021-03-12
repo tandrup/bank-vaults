@@ -428,6 +428,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 }
 
 func Test_mutatingWebhook_mutatePod(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		k8sClient kubernetes.Interface
 		registry  registry.ImageRegistry
@@ -790,6 +792,8 @@ func Test_mutatingWebhook_mutatePod(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mw := &mutatingWebhook{
 				k8sClient: tt.fields.k8sClient,
 				registry:  tt.fields.registry,

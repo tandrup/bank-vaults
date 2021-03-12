@@ -63,6 +63,7 @@ func (g *gcsStorage) Get(key string) ([]byte, error) {
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return nil, kv.NewNotFoundError("error getting object for key '%s': %s", n, err.Error())
 		}
+
 		return nil, errors.Wrapf(err, "error getting object for key '%s'", n)
 	}
 

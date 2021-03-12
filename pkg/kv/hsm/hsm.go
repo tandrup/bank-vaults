@@ -61,19 +61,19 @@ func New(config Config, storage kv.Service) (kv.Service, error) {
 
 	module, err := p11.OpenModule(config.ModulePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to open p11 module: %s", config.ModulePath)
 	}
 
 	info, err := module.Info()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get module info")
 	}
 
 	log.Infof("HSM Information %+v", info)
 
 	slots, err := module.Slots()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to list module slots")
 	}
 
 	log.Infof("HSM Searching for slot in HSM slots %+v", slots)

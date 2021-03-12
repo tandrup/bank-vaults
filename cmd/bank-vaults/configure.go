@@ -129,9 +129,11 @@ var configureCmd = &cobra.Command{
 						if errorFatal {
 							os.Exit(1)
 						}
+
 						failedConfigurationsCount++
 						// Failed configuration handler - Increase the backoff sleep
 						go handleConfigurationError(config.ConfigFileUsed(), configurations, b.Duration())
+
 						return
 					}
 
@@ -139,6 +141,7 @@ var configureCmd = &cobra.Command{
 					b.Reset()
 					successfulConfigurationsCount++
 					logrus.Info("successfully configured vault")
+
 					return
 				}
 			}()

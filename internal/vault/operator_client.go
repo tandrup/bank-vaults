@@ -391,6 +391,7 @@ func (v *vault) RaftJoin(leaderAPIAddr string) error {
 
 		if initialized {
 			logrus.Info("vault is already initialized, skipping raft join")
+
 			return nil
 		}
 	} else if strings.HasSuffix(os.Getenv("POD_NAME"), "-0") {
@@ -424,6 +425,7 @@ func (v *vault) RaftJoin(leaderAPIAddr string) error {
 
 	if response.Joined {
 		logrus.Info("vault joined raft cluster")
+
 		return nil
 	}
 
@@ -513,6 +515,7 @@ func (v *vault) kubernetesAuthConfigDefault() (map[string]interface{}, error) {
 		"kubernetes_ca_cert": string(kubernetesCACert),
 		"token_reviewer_jwt": string(tokenReviewerJWT),
 	}
+
 	return config, err
 }
 

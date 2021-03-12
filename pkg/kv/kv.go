@@ -43,6 +43,7 @@ func IsNotFoundError(err error) bool {
 	if errors.As(err, &notFoundErr) && notFoundErr.NotFound() {
 		return true
 	}
+
 	return false
 }
 

@@ -123,7 +123,7 @@ func blobRead(urlstr string) (string, error) {
 
 	u, err := url.Parse(urlstr)
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "failed to parse blob url: %s", urlstr)
 	}
 
 	i := strings.LastIndex(u.Path, "/")
@@ -132,13 +132,13 @@ func blobRead(urlstr string) (string, error) {
 
 	bucket, err := blob.OpenBucket(ctx, u.String())
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "failed to open blob bucket: %s", u.String())
 	}
 	defer bucket.Close()
 
 	data, err := bucket.ReadAll(ctx, key)
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "failed to read blob bucket key: %s", key)
 	}
 
 	return string(data), nil
@@ -147,16 +147,16 @@ func blobRead(urlstr string) (string, error) {
 func awsKmsDecrypt(encodedString string, encryptionContext ...string) (string, error) {
 	awsSession, err := session.NewSession()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to create AWS session")
 	}
 	svc := kms.New(awsSession)
 	decoded, err := base64.StdEncoding.DecodeString(encodedString)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to decode base64 string")
 	}
 	result, err := svc.Decrypt(&kms.DecryptInput{CiphertextBlob: decoded, EncryptionContext: convertContextMap(encryptionContext)})
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to decrypt ciphertext")
 	}
 
 	return string(result.Plaintext), nil
