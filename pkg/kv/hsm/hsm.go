@@ -56,7 +56,7 @@ func New(config Config, storage kv.Service) (kv.Service, error) {
 	log := logrus.New()
 
 	if config.KeyLabel == "" {
-		return nil, errors.New("key label is required") // nolint:goerr113
+		return nil, errors.New("key label is required")
 	}
 
 	module, err := p11.OpenModule(config.ModulePath)
@@ -83,6 +83,7 @@ func New(config Config, storage kv.Service) (kv.Service, error) {
 			if s.ID() == config.SlotID {
 				slot = &s // nolint:gosec
 				log.Infof("found HSM slot %d in HSM by slot ID", slot.ID())
+
 				break
 			}
 		} else {
@@ -93,13 +94,14 @@ func New(config Config, storage kv.Service) (kv.Service, error) {
 			if tokenInfo.Label == config.TokenLabel {
 				slot = &s // nolint:gosec
 				log.Infof("found HSM slot %d in HSM by token label", slot.ID())
+
 				break
 			}
 		}
 	}
 
 	if slot == nil {
-		return nil, errors.New("can't find HSM slot") // nolint:goerr113
+		return nil, errors.New("can't find HSM slot")
 	}
 
 	tokenInfo, err := slot.TokenInfo()
@@ -302,6 +304,7 @@ func (h *hsmStorage) Get(key string) ([]byte, error) {
 		if err.Error() == noObjectsFoundErrMsg {
 			return nil, kv.NewNotFoundError("object doesn't exist in HSM: %s", key)
 		}
+
 		return nil, errors.Wrap(err, "failed to read object from HSM")
 	}
 
@@ -316,5 +319,6 @@ func (h *hsmStorage) Set(key string, value []byte) error {
 	}
 
 	_, err := h.session.CreateObject(attributes)
+
 	return errors.Wrap(err, "failed to write object to HSM")
 }

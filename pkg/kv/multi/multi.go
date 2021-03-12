@@ -38,11 +38,13 @@ func (f *multi) Set(key string, val []byte) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (f *multi) Get(key string) ([]byte, error) {
 	multiErr := errors.NewPlain("Can't find key in any of the backends")
+
 	for _, service := range f.services {
 		val, err := service.Get(key)
 		if err != nil {
@@ -56,5 +58,6 @@ func (f *multi) Get(key string) ([]byte, error) {
 			return val, nil
 		}
 	}
+
 	return nil, multiErr
 }

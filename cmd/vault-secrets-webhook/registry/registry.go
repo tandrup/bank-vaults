@@ -88,6 +88,7 @@ func (r *Registry) GetImageConfig(
 	if allowToCache {
 		if imageConfig, cacheHit := r.imageCache.Get(container.Image); cacheHit {
 			logger.Infof("found image %s in cache", container.Image)
+
 			return imageConfig.(*v1.Config), nil
 		}
 	}

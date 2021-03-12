@@ -108,7 +108,6 @@ type kvTester struct {
 
 func (t kvTester) Test(key string) error {
 	_, err := t.Service.Get(key)
-
 	if err != nil {
 		if !isNotFoundError(err) {
 			return err
@@ -137,6 +136,7 @@ func (v *vault) Sealed() (bool, error) {
 	if err != nil {
 		return false, errors.Wrap(err, "error checking status")
 	}
+
 	return resp.Sealed, nil
 }
 
@@ -152,6 +152,7 @@ func (v *vault) Active() (bool, error) {
 	if resp.StatusCode == http.StatusOK {
 		return true, nil
 	}
+
 	return false, errors.Errorf("error unexpected status code: %d", resp.StatusCode)
 }
 
@@ -160,6 +161,7 @@ func (v *vault) Leader() (bool, error) {
 	if err != nil {
 		return false, errors.Wrap(err, "error checking leader")
 	}
+
 	return resp.IsSelf, nil
 }
 
@@ -174,14 +176,12 @@ func (v *vault) Unseal() error {
 
 		logrus.Debugf("retrieving key from kms service...")
 		k, err := v.keyStore.Get(keyID)
-
 		if err != nil {
 			return errors.Wrapf(err, "unable to get key '%s'", keyID)
 		}
 
 		logrus.Debugf("sending unseal request to vault...")
 		resp, err := v.cl.Sys().Unseal(string(k))
-
 		if err != nil {
 			return errors.Wrap(err, "fail to send unseal request to vault")
 		}
@@ -194,7 +194,7 @@ func (v *vault) Unseal() error {
 
 		// if progress is 0, we failed to unseal vault.
 		if resp.Progress == 0 {
-			return errors.New("failed to unseal vault, are you using the right unseal keys?") // nolint:goerr113
+			return errors.New("failed to unseal vault, are you using the right unseal keys?")
 		}
 	}
 }
@@ -204,10 +204,11 @@ type notFoundError interface {
 }
 
 func isNotFoundError(err error) bool {
-	cause := errors.Cause(err)
-	if notFoundError, ok := cause.(notFoundError); ok && notFoundError.NotFound() {
+	var notFoundErr notFoundError
+	if errors.As(err, &notFoundErr) && notFoundErr.NotFound() {
 		return true
 	}
+
 	return false
 }
 
@@ -216,6 +217,7 @@ func (v *vault) keyStoreNotFound(key string) (bool, error) {
 	if isNotFoundError(err) {
 		return true, nil
 	}
+
 	return false, err
 }
 
@@ -238,6 +240,7 @@ func (v *vault) Init() error {
 	}
 	if initialized {
 		logrus.Info("vault is already initialized")
+
 		return nil
 	}
 
@@ -278,7 +281,6 @@ func (v *vault) Init() error {
 		RecoveryShares:    v.config.SecretShares,
 		RecoveryThreshold: v.config.SecretThreshold,
 	})
-
 	if err != nil {
 		return errors.Wrap(err, "error initializing vault")
 	}
@@ -286,7 +288,6 @@ func (v *vault) Init() error {
 	for i, k := range resp.Keys {
 		keyID := v.unsealKeyForID(i)
 		err := v.keyStoreSet(keyID, []byte(k))
-
 		if err != nil {
 			return errors.Wrapf(err, "error storing unseal key '%s'", keyID)
 		}
@@ -297,7 +298,6 @@ func (v *vault) Init() error {
 	for i, k := range resp.RecoveryKeys {
 		keyID := v.recoveryKeyForID(i)
 		err := v.keyStoreSet(keyID, []byte(k))
-
 		if err != nil {
 			return errors.Wrapf(err, "error storing recovery key '%s'", keyID)
 		}
@@ -311,7 +311,6 @@ func (v *vault) Init() error {
 	if v.config.InitRootToken != "" {
 		logrus.Info("setting up init root token, waiting for vault to be unsealed")
 
-		count := 0
 		wait := time.Second * 2
 		for {
 			sealed, err := v.Sealed()
@@ -324,7 +323,6 @@ func (v *vault) Init() error {
 				logrus.Infof("vault not reachable: %s", err.Error())
 			}
 
-			count++
 			time.Sleep(wait)
 		}
 
@@ -429,7 +427,7 @@ func (v *vault) RaftJoin(leaderAPIAddr string) error {
 		return nil
 	}
 
-	return errors.New("vault hasn't joined raft cluster") // nolint:goerr113
+	return errors.New("vault hasn't joined raft cluster")
 }
 
 func (v *vault) Configure(config *viper.Viper) error {
@@ -1186,7 +1184,7 @@ func (v *vault) configureSecretEngines(config *viper.Viper) error {
 				// Delete the rotate key from the map, so we don't push it to vault
 				delete(subConfigData, "save_to")
 
-				var shouldUpdate = true
+				shouldUpdate := true
 				if (createOnly || rotate) && mountExists {
 					var sec interface{}
 					if configOption == "root/generate" { // the pki generate call is a different beast
@@ -1223,6 +1221,7 @@ func (v *vault) configureSecretEngines(config *viper.Viper) error {
 					if err != nil {
 						if isOverwriteProhibitedError(err) {
 							logrus.Infoln("can't reconfigure", configPath, "please delete it manually")
+
 							continue
 						}
 						return errors.Wrapf(err, "error configuring %s config in vault", configPath)

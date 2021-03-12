@@ -51,6 +51,8 @@ func (r *MockRegistry) GetImageConfig(_ context.Context, _ kubernetes.Interface,
 }
 
 func Test_mutatingWebhook_mutateContainers(t *testing.T) {
+	t.Parallel()
+
 	vaultConfigEnvFrom := vaultConfig
 	vaultConfigEnvFrom.VaultEnvFromPath = "secrets/application"
 
@@ -72,7 +74,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 		wantErr          bool
 		wantedContainers []corev1.Container
 	}{
-		{name: "Will mutate container with command, no args",
+		{
+			name: "Will mutate container with command, no args",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -120,7 +123,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: true,
 			wantErr: false,
 		},
-		{name: "Will mutate container with command, other syntax",
+		{
+			name: "Will mutate container with command, other syntax",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -168,7 +172,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: true,
 			wantErr: false,
 		},
-		{name: "Will mutate container with args, no command",
+		{
+			name: "Will mutate container with args, no command",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -218,7 +223,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: true,
 			wantErr: false,
 		},
-		{name: "Will mutate container with no container-command, no entrypoint",
+		{
+			name: "Will mutate container with no container-command, no entrypoint",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -268,7 +274,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: true,
 			wantErr: false,
 		},
-		{name: "Will not mutate container without secrets with correct prefix",
+		{
+			name: "Will not mutate container without secrets with correct prefix",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -295,7 +302,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: false,
 			wantErr: false,
 		},
-		{name: "Will mutate container with env-from-path annotation",
+		{
+			name: "Will mutate container with env-from-path annotation",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -344,7 +352,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 			mutated: true,
 			wantErr: false,
 		},
-		{name: "Will mutate container with command, no args, with inline mutation",
+		{
+			name: "Will mutate container with command, no args, with inline mutation",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -396,6 +405,8 @@ func Test_mutatingWebhook_mutateContainers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mw := &mutatingWebhook{
 				k8sClient: tt.fields.k8sClient,
 				registry:  tt.fields.registry,
@@ -440,7 +451,8 @@ func Test_mutatingWebhook_mutatePod(t *testing.T) {
 		wantErr   bool
 		wantedPod *corev1.Pod
 	}{
-		{name: "Will mutate pod with ct-configmap annotations",
+		{
+			name: "Will mutate pod with ct-configmap annotations",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
@@ -629,7 +641,8 @@ func Test_mutatingWebhook_mutatePod(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{name: "Will mutate pod with agent-configmap annotations",
+		{
+			name: "Will mutate pod with agent-configmap annotations",
 			fields: fields{
 				k8sClient: fake.NewSimpleClientset(),
 				registry: &MockRegistry{
