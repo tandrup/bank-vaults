@@ -879,6 +879,7 @@ func (v *vault) configureAwsConfig(path string, config map[string]interface{}) e
 	if err != nil {
 		return errors.Wrap(err, "error putting aws config into vault")
 	}
+
 	return nil
 }
 
@@ -901,6 +902,7 @@ func (v *vault) configureGenericAuthRoles(method, path, roleSubPath string, role
 			return errors.Wrapf(err, "error putting %s %s role into vault", role["name"], method)
 		}
 	}
+
 	return nil
 }
 
@@ -916,6 +918,7 @@ func (v *vault) configureUserpassUsers(path string, users []interface{}) error {
 			return errors.Wrapf(err, "error putting userpass %s user into vault", user["username"])
 		}
 	}
+
 	return nil
 }
 
@@ -933,6 +936,7 @@ func (v *vault) configureAWSCrossAccountRoles(path string, crossAccountRoles []i
 			return errors.Wrapf(err, "error putting %s cross account aws role into vault", stsAccount)
 		}
 	}
+
 	return nil
 }
 
@@ -973,6 +977,7 @@ func (v *vault) configureJwtRoles(path string, roles []interface{}) error {
 			return errors.Wrapf(err, "error putting %s jwt role into vault", role["name"])
 		}
 	}
+
 	return nil
 }
 
@@ -1055,6 +1060,7 @@ func (v *vault) mountExists(path string) (bool, error) {
 		return false, errors.Wrap(err, "error reading mounts from vault")
 	}
 	logrus.Infof("already existing mounts: %+v", mounts)
+
 	return mounts[path+"/"] != nil, nil
 }
 

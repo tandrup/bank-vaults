@@ -23,6 +23,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -130,8 +131,7 @@ func execute() {
 	}()
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		logrus.Fatalf("error executing command: %s", err.Error())
 	}
 }
 
